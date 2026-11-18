@@ -1,20 +1,9 @@
-import os
 import sys
 import ase
 import numpy as np
-import scipy as sp
-import matplotlib.pyplot as plt
-import marimo as mo
 
-from marimol import view_structure
-from ase.visualize import view
-
-sys.path.insert(0, '..')
-
-from kineticssandbox.system import system
-from kineticssandbox.potential import D1, Dn
-from kineticssandbox.integrator import Dn_integrator, Dn_stochastic
-
+sys.path.insert(0, '../')
+from potential import D1, Dn
 
 def fibonacci_lattice_on_sphere(
     num_atoms: int,
@@ -132,10 +121,8 @@ def get_cluster_3d(
 def show_cluster(
     positions: np.ndarray[float],
     species: list[str]
-) -> dict[str, np.ndarry[float] | list[str]]:
+) -> dict[str, np.ndarray[float] | list[str]]:
 
-    # Create as an ASE Atoms object (convert coordinates from GROMACS nm to 
-    # ASE Angstrom)
     if positions.shape[1] == 2:
         positions_3d = np.zeros([positions.shape[0], 3], dtype=float)
         positions_3d[:, :2] = positions
@@ -346,7 +333,7 @@ def scan_distance(
         # Compute energy
         energies_scan[ii] = potential.potential(
             positions_scan.flatten(),
-            verbose=verbose
+            verbose=verbose,
         )
 
     return np.array(energies_scan, dtype=float)

@@ -4,32 +4,51 @@ __generated_with = "0.25.2"
 app = marimo.App(width="medium")
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## AlgoSB 2026: Learning Protein Dynamics
+    # Dynamic Reweighting for Unbinding Processes
+
+    Flavor text for introducing model systems for unbinding processes such as the simple Lennard-Jones cluster in either 2D or 3D.
+
+    In this exercise, we simulate the unbinding process of a target atom from the model of a Lennard-Jones (LJ) cluster.
+    """)
+    return
+
+
 @app.cell
 def _():
-    import os
     import sys
-    import ase
+
     import numpy as np
     import scipy as sp
+
     import matplotlib.pyplot as plt
+
     import marimo as mo
-
     from marimol import view_structure
-    from ase.visualize import view
 
+    sys.path.insert(0, '../')
+    from system import system
+    from potential import D1, Dn
+    from integrator import Dn_integrator, Dn_stochastic
+    from utils.tools import (
+        get_cluster_2d, get_cluster_3d,
+        optimize_cluster, show_cluster,
+        get_potential,
+        scan_distance,
+        get_thermalized_velocities_nd
+    )
 
-    from basics import get_cluster_2d, get_cluster_3d, show_cluster, get_potential, optimize_cluster, scan_distance
-
-    sys.path.insert(0, '..')
-    from kineticssandbox.system import system
-    from kineticssandbox.potential import D1, Dn
-    from kineticssandbox.integrator import Dn_integrator, Dn_stochastic
 
     return (
         D1,
         Dn_stochastic,
         get_cluster_2d,
         get_potential,
+        get_thermalized_velocities_nd,
+        mo,
         np,
         optimize_cluster,
         plt,
@@ -207,6 +226,7 @@ def _(np, plt, positions_min, potential_md, scan_distance):
 def _(
     Dn_stochastic,
     cluster_masses,
+    get_thermalized_velocities_nd,
     np,
     positions_min,
     potential_md,
@@ -267,7 +287,6 @@ def _(
     # Import or define a function for initial velocity assignement
     # e.g. from ase.md.velocitydistribution import thermalize_momenta
     # or
-    from basics import get_thermalized_velocities_nd
     _ = get_thermalized_velocities_nd(temperature, masses, scale_exactly=False, verbose=True)
     _ = get_thermalized_velocities_nd(temperature, masses, scale_exactly=True, verbose=True)
 
@@ -318,12 +337,12 @@ def _(
         [
             show_cluster(positions_i.reshape(-1, 2), species_init)
             for positions_i in trajectory_test_positions[0:_step + 1:100]
-        ]
+        ],
+        trajectory_slider=True,
     )
     return (
         Nsimulation,
         Nsteps,
-        get_thermalized_velocities_nd,
         mask_md,
         masses,
         md_diffusion_times,
